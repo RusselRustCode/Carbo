@@ -22,3 +22,4 @@ class ResearchGroup(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     )
 
     members = relationship("GroupMember", back_populates="group", cascade="all, delete-orphan")
+    group_projects = relationship("GroupProject", back_populates="group", cascade="all, delete-orphan")

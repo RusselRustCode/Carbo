@@ -24,3 +24,23 @@ class TaskStatus(str, enum.Enum):
     blocked = "blocked"
     done = "done"
     cancelled = "cancelled"
+
+
+class ProjectStatus(str, enum.Enum):
+    planning = "planning"
+    active = "active"
+    completed = "completed"
+    archived = "archived"
+
+
+class AccessLevel(str, enum.Enum):
+    read = "read"
+    write = "write"
+    admin = "admin"
+
+
+class GoalStatus(str, enum.Enum):
+    open = "open"
+    in_progress = "in_progress"
+    achieved = "achieved"
+    cancelled = "cancelled"

@@ -7,16 +7,12 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from alembic import context
 
-# this is the Alembic Config object, which provides
-# access to the values within the .ini file in use.
 config = context.config
 
-# Interpret the config file for Python logging.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Import target metadata from the application's models
-models_mod = importlib.import_module('app.models.base')
+models_mod = importlib.import_module('app.models')
 target_metadata = models_mod.Base.metadata
 
 def run_migrations_offline() -> None:

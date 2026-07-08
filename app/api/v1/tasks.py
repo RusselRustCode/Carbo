@@ -49,7 +49,7 @@ async def create_task(payload: TaskCreate, db: AsyncSession = Depends(get_db)):
 async def list_tasks(skip: int = Query(0), limit: int = Query(50), db: AsyncSession = Depends(get_db)):
     q = await db.execute("SELECT * FROM tasks WHERE deleted_at IS NULL OFFSET :skip LIMIT :limit", {"skip": skip, "limit": limit})
     rows = q.fetchall()
-    return [dict(r) for r in q]
+    return [dict(r) for r in rows]
 
 @router.get("/tasks/{task_id}", response_model=TaskResponse)
 async def get_task(task_id: str, db: AsyncSession = Depends(get_db)):

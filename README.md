@@ -5,6 +5,7 @@ Minimal scaffold for Carbon Polygon backend using FastAPI, SQLAlchemy 2.0 (async
 Run development server:
 
 ```bash
-export DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/carbon
+export DATABASE_URL=postgresql+asyncpg://carbon:carbon@localhost:5432/carbon_polygon
+
 uvicorn app.main:app --reload
 ```

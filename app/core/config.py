@@ -13,3 +13,5 @@ class Settings(BaseSettings):
     )
 
 settings = Settings()
+
+print(f"DATABASE_URL loaded: {settings.DATABASE_URL}")

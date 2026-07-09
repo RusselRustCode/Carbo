@@ -3,9 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, func
 from app.crud.base import CRUDBase
 from app.models.project import Project
-from app.services.audit import AuditService
-
-audit_service = AuditService()
+from app.services.audit import audit_service
 
 class CRUDProject(CRUDBase[Project]):
     async def list(self, db: AsyncSession, skip: int = 0, limit: int = 100) -> List[Project]:

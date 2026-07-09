@@ -1,7 +1,10 @@
 from typing import Any, Dict, List
-import json
 from app.models.audit_log import AuditLog
+from app.models.enums import AuditAction
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
+from datetime import datetime, date
+from typing import Iterable
 
 
 class AuditService:
@@ -11,7 +14,7 @@ class AuditService:
         entity_type: str,
         entity_id: str,
         actor_member_id: str | None,
-        action: str,
+        action: AuditAction,
         old_value: Dict[str, Any] | None,
         new_value: Dict[str, Any] | None,
     ) -> None:
@@ -26,16 +29,30 @@ class AuditService:
         if not changed:
             return
 
+        def _serialize(v):
+            if v is None:
+                return None
+            if isinstance(v, uuid.UUID):
+                return str(v)
+            if isinstance(v, (datetime, date)):
+                return v.isoformat()
+            if isinstance(v, dict):
+                return {kk: _serialize(vv) for kk, vv in v.items()}
+            if isinstance(v, list) or isinstance(v, tuple) or isinstance(v, set):
+                return [_serialize(x) for x in v]
+            return v
+
         entry = AuditLog(
             entity_type=entity_type,
-            entity_id=str(entity_id),
-            actor_member_id=actor_member_id,
+            entity_id=entity_id,
+            actor_member_id=str(actor_member_id) if actor_member_id is not None else None,
             action=action,
-            changed_fields=json.dumps(changed),
-            old_value=json.dumps({k: old.get(k) for k in changed}),
-            new_value=json.dumps({k: new.get(k) for k in changed}),
-            created_at=None,
+            changed_fields=changed,
+            old_value={k: _serialize(old.get(k)) for k in changed},
+            new_value={k: _serialize(new.get(k)) for k in changed},
         )
         session.add(entry)
         await session.flush()
+# single shared instance for the app
+audit_service = AuditService()
 

@@ -7,6 +7,7 @@ from .project import Project
 from .goal import Goal
 from .group_project import GroupProject
 from .audit_log import AuditLog
+from .work import Work
 
 __all__ = (
     "Base",
@@ -17,5 +18,6 @@ __all__ = (
     "Project",
     "Goal",
     "GroupProject",
+    "Work",
     "AuditLog",
 )

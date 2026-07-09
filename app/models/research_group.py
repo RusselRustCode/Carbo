@@ -21,5 +21,15 @@ class ResearchGroup(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
         default=GroupStatus.active.value,
     )
 
-    members = relationship("GroupMember", back_populates="group", cascade="all, delete-orphan")
+    owner_member = relationship(
+        "GroupMember",
+        foreign_keys=[owner_member_id],
+        post_update=True,
+    )
+    members = relationship(
+        "GroupMember",
+        back_populates="group",
+        cascade="all, delete-orphan",
+        foreign_keys="[GroupMember.group_id]",
+    )
     group_projects = relationship("GroupProject", back_populates="group", cascade="all, delete-orphan")

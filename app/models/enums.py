@@ -26,6 +26,28 @@ class TaskStatus(str, enum.Enum):
     cancelled = "cancelled"
 
 
+class TaskPriority(str, enum.Enum):
+    low = "low"
+    normal = "normal"
+    high = "high"
+    critical = "critical"
+
+
+class WorkStatus(str, enum.Enum):
+    todo = "todo"
+    in_progress = "in_progress"
+    blocked = "blocked"
+    done = "done"
+    cancelled = "cancelled"
+
+class AuditAction(str, enum.Enum):
+    created = "created"
+    updated = "updated"
+    status_changed = "status_changed"
+    deadline_changed = "deadline_changed"
+    assignee_changed = "assignee_changed"
+    deleted = "deleted"
+
 class ProjectStatus(str, enum.Enum):
     planning = "planning"
     active = "active"

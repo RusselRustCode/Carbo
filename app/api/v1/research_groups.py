@@ -10,7 +10,17 @@ router = APIRouter()
 @router.post("/", response_model=ResearchGroupResponse)
 async def create_group(payload: ResearchGroupCreate, db: AsyncSession = Depends(get_db)):
     obj = await research_group_crud.create(db, payload.model_dump())
-    return obj
+    return {
+        'id': obj.id,
+        'name': obj.name,
+        'description': obj.description,
+        'owner_member_id': obj.owner_member_id,
+        'status': obj.status,
+        'created_at': obj.created_at,
+        'updated_at': obj.updated_at,
+        'deleted_at': obj.deleted_at,
+        'members': [],
+    }
 
 @router.get("/", response_model=List[ResearchGroupResponse])
 async def list_groups(skip: int = Query(0), limit: int = Query(50), db: AsyncSession = Depends(get_db)):

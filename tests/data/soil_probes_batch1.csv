@@ -1,0 +1,7 @@
+Sample Date,Location,PH Level,Carbon Content (%),Nitrogen (mg/kg),Notes
+2026-07-10,Plot A-1,6.5,2.3,45.2,Normal
+2026-07-10,Plot A-2,7.1,1.8,38.7,
+,,,,,
+2026-07-11,Plot B-1,5.9,3.1,52.0,High moisture
+2026-07-11,Plot B-2,INVALID,2.0,41.5,pH sensor error
+2026-07-12,Plot C-1,6.8,,48.3,Missing carbon data

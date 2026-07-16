@@ -54,30 +54,55 @@ def upgrade() -> None:
         sa.Column('goal_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('title', sa.String(length=255), nullable=False),
         sa.Column('description', sa.Text(), nullable=True),
+        sa.Column('responsible_member_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('status', sa.String(length=32), nullable=False, server_default=sa.text("'todo'")),
+        sa.Column('priority', sa.String(length=32), nullable=False, server_default=sa.text("'normal'")),
         sa.Column('deadline_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.Column('completed_at', sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.Column('deleted_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(['responsible_member_id'], ['group_members.id'], ondelete='RESTRICT'),
+    )
+
+    op.create_table(
+        'works',
+        sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
+        sa.Column('task_id', postgresql.UUID(as_uuid=True), nullable=False),
+        sa.Column('title', sa.String(length=255), nullable=False),
+        sa.Column('description', sa.Text(), nullable=True),
+        sa.Column('result', sa.Text(), nullable=True),
+        sa.Column('assignee_member_id', postgresql.UUID(as_uuid=True), nullable=True),
+        sa.Column('starts_at', sa.Date(), nullable=True),
+        sa.Column('deadline_at', sa.Date(), nullable=True),
+        sa.Column('completed_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.Column('status', sa.String(length=32), nullable=False, server_default=sa.text("'todo'")),
+        sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
+        sa.Column('updated_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
+        sa.Column('deleted_at', sa.TIMESTAMP(timezone=True), nullable=True),
+        sa.ForeignKeyConstraint(['task_id'], ['tasks.id'], ondelete='CASCADE'),
+        sa.ForeignKeyConstraint(['assignee_member_id'], ['group_members.id'], ondelete='RESTRICT'),
     )
 
     # Audit log
     op.create_table(
         'audit_log',
         sa.Column('id', postgresql.UUID(as_uuid=True), primary_key=True),
-        sa.Column('entity_type', sa.String(length=128), nullable=False),
-        sa.Column('entity_id', sa.String(length=128), nullable=False),
+        sa.Column('entity_type', sa.String(length=100), nullable=False),
+        sa.Column('entity_id', postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column('actor_member_id', postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column('action', sa.String(length=64), nullable=False),
-        sa.Column('changed_fields', sa.Text(), nullable=True),
-        sa.Column('old_value', sa.Text(), nullable=True),
-        sa.Column('new_value', sa.Text(), nullable=True),
+        sa.Column('changed_fields', sa.JSON(), nullable=True),
+        sa.Column('old_value', sa.JSON(), nullable=True),
+        sa.Column('new_value', sa.JSON(), nullable=True),
         sa.Column('created_at', sa.TIMESTAMP(timezone=True), server_default=sa.text('now()'), nullable=False),
     )
+    op.create_index('ix_audit_entity_created', 'audit_log', ['entity_type', 'entity_id', 'created_at'])
 
 
 def downgrade() -> None:
     op.drop_table('audit_log')
+    op.drop_table('works')
     op.drop_table('tasks')
     op.drop_index(op.f('ix_group_members_employee_id'), table_name='group_members')
     op.drop_index(op.f('ix_group_members_group_id'), table_name='group_members')

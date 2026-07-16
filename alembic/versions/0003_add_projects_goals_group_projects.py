@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = '0003_add_projects_goals_group_projects'
+revision = '0003'
 down_revision = '0002_add_groups_members_tasks'
 branch_labels = None
 depends_on = None
@@ -43,6 +43,7 @@ def upgrade() -> None:
     )
     op.create_foreign_key('fk_goals_project_id', 'goals', 'projects', ['project_id'], ['id'])
     op.create_index(op.f('ix_goals_project_id'), 'goals', ['project_id'], unique=False)
+    op.create_foreign_key('fk_tasks_goal_id', 'tasks', 'goals', ['goal_id'], ['id'], ondelete='SET NULL')
 
     op.create_table(
         'group_projects',

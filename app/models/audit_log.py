@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from sqlalchemy import String, DateTime, JSON, Enum, func
+from sqlalchemy import String, DateTime, JSON, Enum, func, Index
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from app.models.base import Base, UUIDMixin
@@ -8,6 +8,10 @@ from app.models.enums import AuditAction
 
 class AuditLog(Base, UUIDMixin):
     __tablename__ = "audit_log"
+
+    __table_args__ = (
+        Index("ix_audit_entity_created", "entity_type", "entity_id", "created_at"),
+    )
 
     entity_type: Mapped[str] = mapped_column(String(100), nullable=False)
     entity_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)

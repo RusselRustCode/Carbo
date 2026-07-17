@@ -26,3 +26,7 @@ class Task(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     goal = relationship("Goal", back_populates="tasks")
     responsible_member = relationship("GroupMember")
     works = relationship("Work", back_populates="task", cascade="all, delete-orphan")
+
+    data_artifact_key: Mapped[str | None] = mapped_column(
+        String(500), nullable=True, default=None
+    )

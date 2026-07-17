@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, DateTime, func
 from sqlalchemy.dialects.postgresql import UUID
@@ -9,6 +9,11 @@ from app.models.enums import MemberRole, MemberStatus
 
 class GroupMember(Base, UUIDMixin, TimestampMixin, SoftDeleteMixin):
     __tablename__ = "group_members"
+
+    __table_args__ = (
+        Index("ix_group_members_group_id", "group_id"),
+        Index("ix_group_members_employee_id", "employee_id"),
+    )
 
     group_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("research_groups.id"), nullable=False)
     employee_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("employees.id"), nullable=False)

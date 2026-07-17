@@ -13,6 +13,11 @@ from app.models.task import Task
 from app.models.work import Work
 from app.models.goal import Goal
 from app.models.enums import TaskStatus
+import tempfile
+import os
+from fastapi import UploadFile, File, BackgroundTasks
+from app.services.s3_storage import s3_storage
+from data_pipeline.integration import run_full_pipeline
 
 router = APIRouter()
 service = TaskService()
@@ -129,3 +134,42 @@ async def update_work(work_id: str, payload: WorkUpdate, db: AsyncSession = Depe
 async def delete_work(work_id: str, db: AsyncSession = Depends(get_db)):
     await work_crud.soft_delete(db, work_id)
     return {"ok": True}
+
+
+@router.post("/tasks/{task_id}/artifacts")
+async def upload_task_artifact(
+    task_id: str,
+    file: UploadFile = File(...),
+    background_tasks: BackgroundTasks = None,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Загружает CSV с результатами анализов и запускает ETL-пайплайн.
+    Связывает данные с задачей через data_artifact_key.
+    """
+    task = await task_crud.get(db, task_id)
+    if not task or task.is_deleted:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
+
+    try:
+        # Запускаем полный пайплайн (Bronze → Silver → Validation)
+        # Для MVP делаем синхронно в запросе, 
+        # для прода — вынести в BackgroundTasks или Celery
+        result = run_full_pipeline(tmp_path, task_id=str(task.id))
+
+        task.data_artifact_key = result["silver_key"]
+        await db.flush()
+
+        return {
+            "task_id": result["task_id"],
+            "bronze_key": result["bronze_key"],
+            "silver_key": result["silver_key"],
+            "message": "Data ingested and processed successfully",
+        }
+    finally:
+        os.unlink(tmp_path)

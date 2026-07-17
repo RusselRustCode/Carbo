@@ -44,14 +44,20 @@ def run_full_pipeline(csv_path: str, task_id: str | None = None) -> dict:
     print("\n" + "=" * 60)
     print("STEP 3: VALIDATION")
     print("=" * 60)
-    validate_silver(silver_key, bronze_key)
-
+    
+    is_valid = validate_silver(silver_key, bronze_key) 
+    
+    if not is_valid:
+        raise ValueError(
+            f"Validation failed for task {task_id}. "
+            f"Check logs above for details."
+        )
+    
     return {
         "task_id": task_id,
         "bronze_key": bronze_key,
         "silver_key": silver_key,
     }
-
 
 if __name__ == "__main__":
     import sys
@@ -68,7 +74,7 @@ if __name__ == "__main__":
     result = run_full_pipeline(csv_path, task_id)
 
     print("\n" + "=" * 60)
-    print("🏁 PIPELINE COMPLETE")
+    print("PIPELINE COMPLETE")
     print("=" * 60)
     print(f"  Task ID:    {result['task_id']}")
     print(f"  Bronze:     {result['bronze_key']}")

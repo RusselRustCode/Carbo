@@ -35,6 +35,7 @@ class TaskResponse(TaskBase):
     updated_at: datetime
     completed_at: Optional[datetime] = None
     deleted_at: Optional[datetime] = None
+    data_artifact_key: Optional[str] = None
 
     @computed_field
     @property

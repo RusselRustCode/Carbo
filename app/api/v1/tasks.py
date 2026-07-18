@@ -127,6 +127,7 @@ async def update_work(work_id: str, payload: WorkUpdate, db: AsyncSession = Depe
     work = await service.update_work(db, work_id, payload.model_dump(exclude_none=True))
     if not work:
         raise HTTPException(status_code=404, detail="Work not found")
+    await db.refresh(work)
     return work
 
 

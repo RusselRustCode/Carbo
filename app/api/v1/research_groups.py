@@ -39,11 +39,14 @@ async def update_group(group_id: str, payload: ResearchGroupUpdate, db: AsyncSes
     obj = await research_group_crud.get(db, group_id)
     if not obj or obj.is_deleted:
         raise HTTPException(status_code=404, detail="Group not found")
+    
     for k, v in payload.model_dump(exclude_none=True).items():
         setattr(obj, k, v)
-    await db.flush()
+    
+    # Явно обновляем объект в сессии, чтобы загрузить актуальные значения (включая updated_at)
+    await db.refresh(obj)
+    
     return obj
-
 @router.delete("/{group_id}")
 async def delete_group(group_id: str, db: AsyncSession = Depends(get_db)):
     await research_group_crud.soft_delete(db, group_id)

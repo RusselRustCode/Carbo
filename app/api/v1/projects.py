@@ -30,6 +30,7 @@ async def update_project(project_id: str, payload: ProjectUpdate, db: AsyncSessi
     if not obj or obj.is_deleted:
         raise HTTPException(status_code=404, detail="Project not found")
     updated = await project_crud.update(db, obj, payload.model_dump(exclude_none=True))
+    await db.refresh(updated)
     return updated
 
 @router.delete("/projects/{project_id}")

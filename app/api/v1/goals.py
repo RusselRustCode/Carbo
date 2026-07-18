@@ -39,6 +39,7 @@ async def update_goal(goal_id: str, payload: GoalUpdate, db: AsyncSession = Depe
     if not obj or obj.is_deleted:
         raise HTTPException(status_code=404, detail="Goal not found")
     updated = await goal_crud.update(db, obj, payload.model_dump(exclude_none=True))
+    await db.refresh(updated)
     return updated
 
 @router.delete("/goals/{goal_id}")

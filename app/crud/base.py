@@ -11,7 +11,15 @@ class CRUDBase(Generic[ModelType]):
         return await db.get(self.model, id)
 
     async def create(self, db: AsyncSession, obj_in) -> ModelType:
-        obj = self.model(**obj_in)
+        if hasattr(obj_in, "model_dump"):
+            obj_in_data = obj_in.model_dump()  
+        elif hasattr(obj_in, "dict"):
+            obj_in_data = obj_in.dict()        
+        else:
+            obj_in_data = obj_in               
+
+        obj = self.model(**obj_in_data)
         db.add(obj)
         await db.flush()
+        await db.refresh(obj)   
         return obj

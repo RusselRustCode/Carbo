@@ -43,6 +43,7 @@ async def update_group_project(link_id: str, payload: GroupProjectUpdate, db: As
     if not obj or obj.is_deleted:
         raise HTTPException(status_code=404, detail="Group project not found")
     updated = await group_project_crud.update(db, obj, payload.model_dump(exclude_none=True))
+    await db.refresh(updated)
     return updated
 
 @router.delete("/group-projects/{link_id}")
